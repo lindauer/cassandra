@@ -57,6 +57,16 @@ public class BloomFilter extends Filter
     }
 
     /**
+    * @return a bloom filter with the specified number of hashes and bits.
+    */
+    public static BloomFilter getFilterWithSpec(int hashes, long buckets)
+    {
+        assert hashes > 0 : "Invalid hash count";
+        assert buckets > 0: "Invalid bucket count";
+        return new BloomFilter(hashes, new OpenBitSet(buckets));
+    }
+
+    /**
     * @return A BloomFilter with the lowest practical false positive probability
     * for the given number of elements.
     */
