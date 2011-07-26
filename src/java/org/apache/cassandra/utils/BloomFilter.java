@@ -19,6 +19,7 @@
 package org.apache.cassandra.utils;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import org.apache.cassandra.io.ICompactSerializer2;
 import org.slf4j.Logger;
@@ -131,6 +132,48 @@ public class BloomFilter extends Filter
             bitset.set(bucketIndex);
         }
     }
+
+    /**
+    * Add a key to the bloom filter and set any changed bits in diff.
+    *
+    * @return true if there were changes, false otherwise
+    */
+    public boolean addAndDiff(ByteBuffer key, OpenBitSet diff)
+    {
+        boolean changed = false;
+        for (long bucketIndex : getHashBuckets(key))
+        {
+            if (!bitset.get(bucketIndex))
+            {
+                changed = true;
+                diff.set(bucketIndex);
+                bitset.set(bucketIndex);
+            }
+        }
+        return changed;
+    }
+
+
+    /**
+    * Add a key to the bloom filter and add any changed bits to the list.
+    *
+    * @return true if there were changes, false otherwise
+    */
+    public boolean addAndDiff(ByteBuffer key, List<Long> changes)
+    {
+        boolean changed = false;
+        for (long bucketIndex : getHashBuckets(key))
+        {
+            if (!bitset.get(bucketIndex))
+            {
+                changed = true;
+                changes.add(bucketIndex);
+                bitset.set(bucketIndex);
+            }
+        }
+        return changed;
+    }
+
 
     public boolean isPresent(ByteBuffer key)
     {
