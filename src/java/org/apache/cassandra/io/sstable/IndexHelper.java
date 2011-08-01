@@ -105,9 +105,9 @@ public class IndexHelper
         return indexList;
 	}
 
-    public static Filter defreezeBloomFilter(FileDataInput file, boolean usesOldBloomFilter) throws IOException
+    public static Filter defreezeBloomFilter(FileDataInput file, boolean usesOldBloomFilter, boolean usesMurmur2BloomFilter) throws IOException
     {
-        return defreezeBloomFilter(file, Integer.MAX_VALUE, usesOldBloomFilter);
+        return defreezeBloomFilter(file, Integer.MAX_VALUE, usesOldBloomFilter, usesMurmur2BloomFilter);
     }
 
     /**
@@ -115,14 +115,15 @@ public class IndexHelper
      *
      * @param file - source file
      * @param maxSize - sanity check: if filter claimes to be larger than this it is bogus
-     * @param useOldBuffer - do we need to reuse old buffer?
+     * @param usesOldBloomFilter - do we need to use the legacy bloom filter?
+     * @param usesMurmur2BloomFilter - do we need to use the Murmur2 bloom filter?
      *
      * @return bloom filter summarizing the column information
      * @throws java.io.IOException if an I/O error occurs.
      * Guarantees that file's current position will be just after the bloom filter, even if
      * the filter cannot be deserialized, UNLESS EOFException is thrown.
      */
-    public static Filter defreezeBloomFilter(FileDataInput file, long maxSize, boolean useOldBuffer) throws IOException
+    public static Filter defreezeBloomFilter(FileDataInput file, long maxSize, boolean usesOldBloomFilter, boolean usesMurmur2BloomFilter) throws IOException
     {
         int size = file.readInt();
         if (size > maxSize || size <= 0)
@@ -130,9 +131,14 @@ public class IndexHelper
         ByteBuffer bytes = file.readBytes(size);
 
         DataInputStream stream = new DataInputStream(ByteBufferUtil.inputStream(bytes));
-        return useOldBuffer
-                ? LegacyBloomFilter.serializer().deserialize(stream, 0) // version means nothing there.
-                : BloomFilter.serializer().deserialize(stream);
+        if (usesOldBloomFilter)
+            return LegacyBloomFilter.serializer().deserialize(stream, 0); // version means nothing there.
+        else
+        {
+            return usesMurmur2BloomFilter
+                ? Murmur2BloomFilter.serializer().deserialize(stream)
+                : Murmur3BloomFilter.serializer().deserialize(stream);
+        }
     }
 
     /**

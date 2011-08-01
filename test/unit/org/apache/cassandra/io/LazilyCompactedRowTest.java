@@ -119,8 +119,8 @@ public class LazilyCompactedRowTest extends CleanupHelper
             assertEquals(rowSize1 + 8, out1.getLength());
             assertEquals(rowSize2 + 8, out2.getLength());
             // bloom filter
-            IndexHelper.defreezeBloomFilter(in1, rowSize1, false);
-            IndexHelper.defreezeBloomFilter(in2, rowSize2, false);
+            IndexHelper.defreezeBloomFilter(in1, rowSize1, false, false);
+            IndexHelper.defreezeBloomFilter(in2, rowSize2, false, false);
             // index
             int indexSize1 = in1.readInt();
             int indexSize2 = in2.readInt();

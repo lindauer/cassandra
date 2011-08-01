@@ -120,7 +120,7 @@ public class SSTableIdentityIterator implements Comparable<SSTableIdentityIterat
                 {
                     try
                     {
-                        IndexHelper.defreezeBloomFilter(file, dataSize, sstable.descriptor.usesOldBloomFilter);
+                      IndexHelper.defreezeBloomFilter(file, dataSize, sstable.descriptor.usesOldBloomFilter, sstable.descriptor.usesMurmur2BloomFilter);
                     }
                     catch (Exception e)
                     {

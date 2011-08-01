@@ -48,7 +48,7 @@ public class Descriptor
     // f (0.7.0): switched bloom filter implementations in data component
     // g (0.8): tracks flushed-at context in metadata component
     // h (1.0): tracks max client timestamp in metadata component
-    public static final String CURRENT_VERSION = "h";
+    public static final String CURRENT_VERSION = "i";
 
     public final File directory;
     public final String version;
@@ -63,6 +63,7 @@ public class Descriptor
     public final boolean hasEncodedKeys;
     public final boolean isLatestVersion;
     public final boolean usesOldBloomFilter;
+    public final boolean usesMurmur2BloomFilter;
     public final boolean usesHistogramAndReplayPositionStatsFile;
 
     public enum TempState
@@ -104,6 +105,7 @@ public class Descriptor
         hasEncodedKeys = version.compareTo("e") < 0;
         usesOldBloomFilter = version.compareTo("f") < 0;
         usesHistogramAndReplayPositionStatsFile = version.compareTo("h") < 0;
+        usesMurmur2BloomFilter = !usesOldBloomFilter && (version.compareTo("i") < 0);
         isLatestVersion = version.compareTo(CURRENT_VERSION) == 0;
     }
 

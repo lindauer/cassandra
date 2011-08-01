@@ -240,7 +240,10 @@ public class SSTableReader extends SSTable
             }
             else
             {
-                bf = BloomFilter.serializer().deserialize(stream);
+                if (descriptor.usesMurmur2BloomFilter)
+                    bf = Murmur2BloomFilter.serializer().deserialize(stream);
+                else
+                    bf = Murmur3BloomFilter.serializer().deserialize(stream);
             }
         }
         finally

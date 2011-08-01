@@ -156,7 +156,7 @@ public class ColumnIndexer
     private static void writeBloomFilter(DataOutput dos, BloomFilter bf) throws IOException
     {
         DataOutputBuffer bufOut = new DataOutputBuffer();
-        BloomFilter.serializer().serialize(bf, bufOut);
+        bf.serialize(bufOut);
         dos.writeInt(bufOut.getLength());
         dos.write(bufOut.getData(), 0, bufOut.getLength());
         bufOut.flush();

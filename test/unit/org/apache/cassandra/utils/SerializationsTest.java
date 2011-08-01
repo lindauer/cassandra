@@ -39,7 +39,7 @@ public class SerializationsTest extends AbstractSerializationsTester
         for (int i = 0; i < 100; i++)
             bf.add(StorageService.getPartitioner().getTokenFactory().toByteArray(StorageService.getPartitioner().getRandomToken()));
         DataOutputStream out = getOutput("utils.BloomFilter.bin");
-        BloomFilter.serializer().serialize(bf, out);
+        bf.serialize(out);
         out.close();
     }
     
@@ -50,7 +50,7 @@ public class SerializationsTest extends AbstractSerializationsTester
             testBloomFilterWrite();
         
         DataInputStream in = getInput("utils.BloomFilter.bin");
-        assert BloomFilter.serializer().deserialize(in) != null;
+        assert Murmur3BloomFilter.serializer().deserialize(in) != null;
         in.close();
     }
     

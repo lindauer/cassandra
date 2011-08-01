@@ -29,7 +29,7 @@ import org.apache.cassandra.db.DBConstants;
 import org.apache.cassandra.io.ICompactSerializer2;
 import org.apache.cassandra.utils.obs.OpenBitSet;
 
-class BloomFilterSerializer implements ICompactSerializer2<BloomFilter>
+abstract class BloomFilterSerializer implements ICompactSerializer2<BloomFilter>
 {
     public void serialize(BloomFilter bf, DataOutput dos) throws IOException
     {
@@ -51,8 +51,10 @@ class BloomFilterSerializer implements ICompactSerializer2<BloomFilter>
         for (int i = 0; i < bitLength; i++)
             bits[i] = dis.readLong();
         OpenBitSet bs = new OpenBitSet(bits, bitLength);
-        return new BloomFilter(hashes, bs);
+        return createFilter(hashes, bs);
     }
+
+    protected abstract BloomFilter createFilter(int hashes, OpenBitSet bs);
 
     /**
      * Calculates a serialized size of the given Bloom Filter
